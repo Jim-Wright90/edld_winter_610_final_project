@@ -91,6 +91,79 @@ ggplot(recent_grads) +
   labs(x = "Full Time Employment",
        y = "Part Time Employment",
        title = "Employment Status Per Major Category") 
-  
+
+
+recent_grads$Major_category
+
+engineering <- recent_grads %>% 
+  filter(Major_category == "Engineering")
+
+
+percents <- recent_grads %>% 
+  mutate(percent_men = Men/Total*100, 
+         percent_women = Women/Total*100)
+
+
+top_percents_men <- percents %>% 
+  arrange(desc(percent_men, percent_women)) %>% 
+  slice(1:25)
+
+top_percents_women <- percents %>% 
+  arrange(desc(percent_women)) %>% 
+  slice(1:25)
+
+ggplot(top_percents_men, aes(fct_rev(fct_infreq(Major_category)))) +
+    geom_bar(aes(fill = percent_men),
+           color = "white",
+           alpha = 0.9) +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Total",
+       y = "College Major Category",
+       title = "Major Categories with the Highest Percentage of Male Students") 
+
+
+ggplot(top_percents_women, aes(fct_rev(fct_infreq(Major_category)))) +
+    geom_bar(aes(fill = percent_women),
+           color = "white",
+           alpha = 0.9) +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Total",
+       y = "College Major Category",
+       title = "Major Categories with the Highest Percentage of Female Students") 
+
+percents_tidy <- percents %>% 
+  pivot_longer(
+    cols = c(22:23),
+    names_to = "sex",
+    values_to = "percentages"
+  )
+
+percents_tidy_plot <- percents_tidy %>% 
+  filter(percentages >= 90)
+
+ggplot(percents_tidy_plot, aes(fct_rev(fct_infreq(Major_category)))) +
+    geom_bar(fill = "cornflowerblue", 
+            stat = ,
+           color = "black",
+           alpha = 0.9) +
+  coord_flip() +
+  facet_wrap(~sex, ncol = 1) +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Major Categories with 90% Enrollment of One Gender",
+       y = "College Major Category",
+       title = "Major Categories Where Enrollment Contains 90% of One Gender") 
+
+ggplot(recent_grads, aes(Unemployment_rate)) +
+  geom_density(aes(fill = Major_category), 
+               alpha = 0.5) +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Unemployment Rate",
+       y = "Density",
+       title = "Unemployment Rate by Major Category") 
 
 ```
+
+# Plot Ideas Followup 
+After taking time to play with the data sets for this project, I think the recent-grads data set will primarily be my main data set to work with to make plots specifically exploring unemployment rate and the distribution of college major categories by gender. My initial plot ideas will require much more detail and editing, but I think they provide an opportunity to utilize dplyr and tidyr commands learned from the first course combined with ggplot skills learned this term. 
