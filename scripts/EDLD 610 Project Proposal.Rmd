@@ -5,6 +5,8 @@ date: "1/28/2020"
 output: html_document
 toc: true
 toc_float: true 
+theme: united 
+highlight: zenburn 
 ---
 
 ```{r setup, include = FALSE}
@@ -38,18 +40,57 @@ women_stem <- import(here("data", "women-stem.csv"),
 The data to be used for this project consists of five data sets from the FiveThirtyEight GitHub page. (https://github.com/fivethirtyeight/data/tree/master/college-majors). All data is from American Community Survey 2010-2012 Public Use Microdata Series.
 
 
-# Information from the FiveThirtyEight GitHub page on the data
-majors-list.csv
+# Information from the FiveThirtyEight GitHub page on the data:
 
+## majors-list.csv
 List of majors with their FOD1P codes and major categories.
 Major categories are from Carnevale et al, "What's It Worth?: The Economic Value of College Majors." Georgetown University Center on Education and the Workforce, 2011. http://cew.georgetown.edu/whatsitworth
 Three main data files:
 
-all-ages.csv
-recent-grads.csv (ages <28)
-grad-students.csv (ages 25+)
+## all-ages.csv
+## recent-grads.csv (ages <28)
+## grad-students.csv (ages 25+)
 All contain basic earnings and labor force information. recent-grads.csv contains a more detailed breakdown, including by sex and by the type of job they got. grad-students.csv contains details on graduate school attendees.
 
 Additionally, women-stem.csv contains data for scatter plot in associated DataLab post on women in science/technology jobs. It is a subset of recent-grads.csv. (Small easter egg: Check out my related Shiny app: https://bencasselman.shinyapps.io/new-test/)
 
+The information presented above is copied directly from the FiveThirtyEight GitHub repo. 
 
+
+# Plot Ideas
+To complete my project, I intend to practice using the joins() function to merge comparable data sets. All data sets with the exception of the majors_lists data set have comparable columns that will be useful to merge together. The recent-grads.csv data set will most likely be the data set I use the most to produce plots intended for an audience that works in both educational administration and labor relations on trends in employment rate and type of major for recent college graduates. 
+```{r plot ideas, include=TRUE}
+head(all_ages)
+head(grad_students)
+head(majors_lists)
+head(recent_grads)
+head(women_stem)
+
+
+
+recent_grads$Major_category
+
+recent_grads %>% 
+  count(Major_category)
+
+library(forcats)
+
+ggplot(recent_grads, aes(fct_rev(fct_infreq(Major_category)))) +
+  geom_bar(fill = "#56B4E9",
+           color = "white",
+           alpha = 0.9) +
+  coord_flip() + 
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Total",
+       y = "College Major Category",
+       title = "Number of Recent Grads Per Major Category") 
+
+ggplot(recent_grads) +
+  geom_point(aes(Full_time, Part_time, color = Major_category)) +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Full Time Employment",
+       y = "Part Time Employment",
+       title = "Employment Status Per Major Category") 
+  
+
+```
