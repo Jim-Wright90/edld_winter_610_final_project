@@ -19,86 +19,118 @@ library(here)
 
 
 all_ages <- import(here("data", "all-ages.csv"),
-               setclass = "tbl_df")
+               setclass = "tbl_df") %>% 
+               janitor::clean_names() 
+
 
 grad_students <- import(here("data", "grad-students.csv"),
-               setclass = "tbl_df")
+               setclass = "tbl_df") %>% 
+               janitor::clean_names() 
 
 majors_lists <- import(here("data", "majors-list.csv"),
-               setclass = "tbl_df")
+               setclass = "tbl_df") %>% 
+               janitor::clean_names() 
 
 recent_grads <- import(here("data", "recent-grads.csv"),
-               setclass = "tbl_df")
+               setclass = "tbl_df") %>% 
+               janitor::clean_names() 
 
 women_stem <- import(here("data", "women-stem.csv"),
-               setclass = "tbl_df")
+               setclass = "tbl_df") %>% 
+               janitor::clean_names() 
 
 ```
 
 # Plot 1
 ## Data is ranked in order of median income with the highest incomes at the top of the data set 
+### The purpose of this plot will be to display the distribution of median salaries by college major, by specifically focusing on both the top 20 median salaries and bottom 20 median salaries
 ```{r plot 1, include=TRUE}
 
 head(recent_grads)
 head(women_stem)
 
 recent_grads %>% 
-  select(Major, Median, P25th, P75th)
+  select(major, median, p25th, p75th)
 
 
-ggplot(recent_grads, aes(Major_category, Median)) +
+ggplot(recent_grads, aes(major_category, median)) +
   geom_col() +
   coord_flip()
 
-ggplot(recent_grads, aes(fct_reorder(Major_category, Median), Median)) +
+ggplot(recent_grads, aes(fct_reorder(major_category, median), median)) +
   geom_col() +
   geom_col(fill = "cornflowerblue",
-  data = filter(recent_grads, Major_category == "Education")) +  
+  data = filter(recent_grads, major_category == "Education")) +  
   coord_flip()
 
-
-ggplot(recent_grads, aes(fct_reorder(Major, Median), Median)) +
-  geom_col(aes(fill = Major_category),
+ggplot(recent_grads, aes(fct_reorder(major, median), median)) +
+  geom_col(aes(fill = major_category),
   alpha = 0.7) +
   scale_fill_viridis_d() +
   coord_flip()
 
-ggplot(recent_grads, aes(fct_reorder(Major, Median), Median)) +
+ggplot(recent_grads, aes(fct_reorder(major, median), median)) +
   geom_col(alpha = 0.7) +
-  facet_wrap(~Major_category, ncol = 1) + 
+  facet_wrap(~major_category, ncol = 1) + 
   coord_flip()
 #This one is no good
 
 median_top_20 <- recent_grads %>% 
-  arrange(desc(Median)) %>% 
+  arrange(desc(median)) %>% 
   slice(1:20)
 
-ggplot(median_top_20, aes(fct_reorder(Major, Median), Median)) +
-  geom_col(aes(fill = Major_category),
+ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
+  geom_col(aes(fill = major_category),
   alpha = 0.7) +
   scale_fill_viridis_d() +
   coord_flip() +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
-  labs(x = "Median Salary",
-       y = "College Major",
+  labs(x = "College Major",
+       y = "Median Salary",
        fill = "Major Category",
        title = "Top 20 Median Salaries by College Major") 
 
 median_bottom_20 <- recent_grads %>% 
-  arrange(Median) %>% 
+  arrange(median) %>% 
   slice(1:20)
 
-ggplot(median_bottom_20, aes(fct_reorder(Major, Median), Median)) +
-  geom_col(aes(fill = Major_category),
+ggplot(median_bottom_20, aes(fct_reorder(major, median), median)) +
+  geom_col(aes(fill = major_category),
   alpha = 0.7) +
   scale_fill_viridis_d() +
   coord_flip() +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
-  labs(x = "Median Salary",
-       y = "College Major",
+  labs(x = "College Major",
+       y = "Median Salary",
        fill = "Major Category",
        title = "Bottom 20 Median Salaries by College Major") 
 
+recent_grads %>% 
+  count(major)
 
+median_middle_40 <- recent_grads %>% 
+  arrange(median) %>% 
+  slice(80:120)
+
+ggplot(median_middle_40, aes(fct_reorder(major, median), median)) +
+  geom_col(aes(fill = major_category),
+  alpha = 0.7) +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "College Major",
+       y = "Median Salary",
+       fill = "Major Category",
+       title = "Bottom 20 Median Salaries by College Major") 
+
+ggplot(recent_grads, aes(median)) +
+  geom_histogram(fill = "#56B4E9",
+                 color = "black", 
+                 alpha = 0.9,
+                 bins = 25) +
+  theme_minimal(base_size = 15) +
+  labs(x = "Median Salary of College Majors",
+       y = "Total",
+       title = "Distribution of Median Salaries per College Major")
 
 ```
