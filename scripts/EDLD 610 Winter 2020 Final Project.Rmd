@@ -1,0 +1,104 @@
+---
+title: "EDLD 610 Winter 2020 Final Project"
+author: "Jim Wright"
+date: "2/3/2020"
+output: html_document
+theme: united 
+highlight: zenburn 
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE,
+                      echo = FALSE,
+                      dev.args = list(bg="transparent"))
+
+library(tidyverse)
+library(rio)
+library(here)
+
+
+all_ages <- import(here("data", "all-ages.csv"),
+               setclass = "tbl_df")
+
+grad_students <- import(here("data", "grad-students.csv"),
+               setclass = "tbl_df")
+
+majors_lists <- import(here("data", "majors-list.csv"),
+               setclass = "tbl_df")
+
+recent_grads <- import(here("data", "recent-grads.csv"),
+               setclass = "tbl_df")
+
+women_stem <- import(here("data", "women-stem.csv"),
+               setclass = "tbl_df")
+
+```
+
+# Plot 1
+## Data is ranked in order of median income with the highest incomes at the top of the data set 
+```{r plot 1, include=TRUE}
+
+head(recent_grads)
+head(women_stem)
+
+recent_grads %>% 
+  select(Major, Median, P25th, P75th)
+
+
+ggplot(recent_grads, aes(Major_category, Median)) +
+  geom_col() +
+  coord_flip()
+
+ggplot(recent_grads, aes(fct_reorder(Major_category, Median), Median)) +
+  geom_col() +
+  geom_col(fill = "cornflowerblue",
+  data = filter(recent_grads, Major_category == "Education")) +  
+  coord_flip()
+
+
+ggplot(recent_grads, aes(fct_reorder(Major, Median), Median)) +
+  geom_col(aes(fill = Major_category),
+  alpha = 0.7) +
+  scale_fill_viridis_d() +
+  coord_flip()
+
+ggplot(recent_grads, aes(fct_reorder(Major, Median), Median)) +
+  geom_col(alpha = 0.7) +
+  facet_wrap(~Major_category, ncol = 1) + 
+  coord_flip()
+#This one is no good
+
+median_top_20 <- recent_grads %>% 
+  arrange(desc(Median)) %>% 
+  slice(1:20)
+
+ggplot(median_top_20, aes(fct_reorder(Major, Median), Median)) +
+  geom_col(aes(fill = Major_category),
+  alpha = 0.7) +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Median Salary",
+       y = "College Major",
+       fill = "Major Category",
+       title = "Top 20 Median Salaries by College Major") 
+
+median_bottom_20 <- recent_grads %>% 
+  arrange(Median) %>% 
+  slice(1:20)
+
+ggplot(median_bottom_20, aes(fct_reorder(Major, Median), Median)) +
+  geom_col(aes(fill = Major_category),
+  alpha = 0.7) +
+  scale_fill_viridis_d() +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  labs(x = "Median Salary",
+       y = "College Major",
+       fill = "Major Category",
+       title = "Bottom 20 Median Salaries by College Major") 
+
+
+
+```
