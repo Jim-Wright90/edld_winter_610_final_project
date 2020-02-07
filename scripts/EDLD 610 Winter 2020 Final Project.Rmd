@@ -16,6 +16,10 @@ knitr::opts_chunk$set(message = FALSE,
 library(tidyverse)
 library(rio)
 library(here)
+library(colorblindr)
+library(gghighlight)
+library(forcats)
+library(ggrepel)
 
 
 all_ages <- import(here("data", "all-ages.csv"),
@@ -82,9 +86,10 @@ median_top_20 <- recent_grads %>%
 ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
-  scale_fill_viridis_d() +
+  scale_fill_OkabeIto() +
   coord_flip() +
-  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
+        legend.position = "bottom") +
   labs(x = "College Major",
        y = "Median Salary",
        fill = "Major Category",
@@ -97,9 +102,10 @@ median_bottom_20 <- recent_grads %>%
 ggplot(median_bottom_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
-  scale_fill_viridis_d() +
+  scale_fill_OkabeIto() +
   coord_flip() +
-  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
+        legend.position = "bottom") +
   labs(x = "College Major",
        y = "Median Salary",
        fill = "Major Category",
@@ -134,3 +140,75 @@ ggplot(recent_grads, aes(median)) +
        title = "Distribution of Median Salaries per College Major")
 
 ```
+
+# Plot 2
+## The purpose of Plot 2 will be to communicate visualizations of the recent-grads data to display trends in unemployment rate and gender per college major and major category 
+```{r plot 2, include=TRUE}
+
+percentages <- recent_grads %>% 
+  mutate(percent_men = men/total*100, 
+         percent_women = women/total*100, 
+         total_jobs = college_jobs + non_college_jobs + low_wage_jobs, 
+         percent_college_jobs = college_jobs/total_jobs*100,
+         percent_non_college_jobs = non_college_jobs/total_jobs*100, 
+         percent_low_wage_jobs = low_wage_jobs/total_jobs*100,
+         unemployment_rate_percentage = unemployment_rate*100)
+
+percents_tidy <- percentages %>% 
+  pivot_longer(
+    cols = c(22:23),
+    names_to = "sex",
+    values_to = "sex_percentages"
+  ) 
+
+percentages %>% 
+  summarize(mean(median))
+
+percentages %>% 
+  summarize(mean(unemployment_rate_percentage))
+
+plot_2_a <- percents_tidy %>% 
+  filter(median >= 40000,
+         unemployment_rate_percentage <= 6.50)
+
+plot_2_b <- percents_tidy %>% 
+  filter(median <= 40000,
+         unemployment_rate_percentage >= 6.50)
+
+ggplot(plot_2_a) +
+  geom_point(aes(unemployment_rate_percentage, median, color = major_category)) +
+  scale_fill_OkabeIto() +
+  theme(plot.title = element_text(color = "black", 
+                                  size = 12, 
+                                  face = "bold", 
+                                  hjust = 0.5),
+        legend.position = "bottom") +
+  labs(x = "Unemployment Rate Percentage",
+       y = "Median Salary",
+       title = "Comparison of Employment Rate to Median Salary",
+       subtitle = "College Majors with Above Average Median Salary and Below Average Unemployment Rate") 
+
+
+ggplot(plot_2_b, aes(unemployment_rate_percentage, median)) +
+  geom_point(aes(color = major_category), position = "jitter") +
+  geom_label_repel(aes(label = major_category),
+                   box.padding = 0.35,
+                   point.padding = 0.5,
+                   segment.color = "grey50") +
+  theme_minimal() +
+  scale_fill_OkabeIto() +
+  theme(plot.title = element_text(color = "black", 
+                                  size = 12, 
+                                  face = "bold", 
+                                  hjust = 0.5),
+        legend.position = "bottom") +
+  labs(x = "Unemployment Rate Percentage",
+       y = "Median Salary",
+       title = "Comparison of Employment Rate to Median Salary",
+       subtitle = "College Majors with Below Average Median Salary and Above Average Unemployment Rate") 
+#like the idea but needs a lot of cleaning up and trimming of included data 
+
+
+```
+
+
