@@ -139,6 +139,10 @@ ggplot(recent_grads, aes(median)) +
        y = "Total",
        title = "Distribution of Median Salaries per College Major")
 
+ggplot(recent_grads, aes(median, major_category)) +
+  ggridges::geom_density_ridges(color = "white",
+                                fill = "#A9E5C5")
+
 ```
 
 # Plot 2
@@ -207,6 +211,24 @@ ggplot(plot_2_b, aes(unemployment_rate_percentage, median)) +
        title = "Comparison of Employment Rate to Median Salary",
        subtitle = "College Majors with Below Average Median Salary and Above Average Unemployment Rate") 
 #like the idea but needs a lot of cleaning up and trimming of included data 
+
+
+ggplot(percents_tidy, aes(median, major_category)) +
+  ggridges::geom_density_ridges(color = "white",
+                                fill = "#A9E5C5")
+
+
+
+ggplot(percents_tidy, aes(fct_reorder(major_category, unemployment_rate), unemployment_rate)) +
+  geom_col(fill = "cornflowerblue",
+           alpha = 0.7) +
+  coord_flip() +
+  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
+        legend.position = "bottom") +
+  labs(x = "Unemployment Rate",
+       y = "Major Category",
+       title = "Unemployment Rates per Major Category") 
+
 
 
 ```
