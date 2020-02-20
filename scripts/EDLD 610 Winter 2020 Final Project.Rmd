@@ -20,6 +20,7 @@ library(colorblindr)
 library(gghighlight)
 library(forcats)
 library(ggrepel)
+library(gt)
 
 
 all_ages <- import(here("data", "all-ages.csv"),
@@ -47,7 +48,7 @@ women_stem <- import(here("data", "women-stem.csv"),
 
 # Plot 1
 ## Data is ranked in order of median income with the highest incomes at the top of the data set 
-### The purpose of this plot will be to display the distribution of median salaries by college major, by specifically focusing on both the top 20 median salaries and bottom 20 median salaries
+### The purpose of these plots will be to display the distribution of median salaries by college major, by specifically focusing on both the top 20 median salaries and bottom 20 median salaries
 ```{r plot 1, include=TRUE}
 
 head(recent_grads)
@@ -60,7 +61,7 @@ recent_grads %>%
 ggplot(recent_grads, aes(major_category, median)) +
   geom_col() +
   coord_flip()
-#need to figure out how to average the median salary per specific major category levels 
+#need to average the median salary per specific major category levels 
 
 ggplot(recent_grads, aes(fct_reorder(major_category, median), median)) +
   geom_col() +
@@ -82,14 +83,22 @@ median_top_20 <- recent_grads %>%
 ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
+  geom_text(aes(major, median, label = median),
+            nudge_y = 0.02,
+            size = 3) +
   scale_fill_OkabeIto() +
   coord_flip() +
+  scale_y_continuous("Median Salary", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
         legend.position = "bottom") +
   labs(x = "College Major",
        y = "Median Salary",
        fill = "Major Category",
        title = "Top 20 Median Salaries by College Major") 
+#Need to identify how to insert dollar sign into text label on plot
 
 median_bottom_20 <- recent_grads %>% 
   arrange(median) %>% 
@@ -98,8 +107,15 @@ median_bottom_20 <- recent_grads %>%
 ggplot(median_bottom_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
+  geom_text(aes(major, median, label = median),
+            nudge_y = 0.02,
+            size = 3) +
   scale_fill_OkabeIto() +
   coord_flip() +
+  scale_y_continuous("Median Salary", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
         legend.position = "bottom") +
   labs(x = "College Major",
@@ -107,23 +123,6 @@ ggplot(median_bottom_20, aes(fct_reorder(major, median), median)) +
        fill = "Major Category",
        title = "Bottom 20 Median Salaries by College Major") 
 
-recent_grads %>% 
-  count(major)
-
-median_middle_40 <- recent_grads %>% 
-  arrange(median) %>% 
-  slice(80:120)
-
-ggplot(median_middle_40, aes(fct_reorder(major, median), median)) +
-  geom_col(aes(fill = major_category),
-  alpha = 0.7) +
-  scale_fill_viridis_d(option = "magma") +
-  coord_flip() +
-  theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
-  labs(x = "College Major",
-       y = "Median Salary",
-       fill = "Major Category",
-       title = "Bottom 20 Median Salaries by College Major") 
 
 ggplot(recent_grads, aes(median)) +
   geom_histogram(fill = "#56B4E9",
@@ -131,6 +130,10 @@ ggplot(recent_grads, aes(median)) +
                  alpha = 0.9,
                  bins = 25) +
   theme_minimal(base_size = 15) +
+  scale_x_continuous("Median Salary of College Majors", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Median Salary of College Majors",
        y = "Total",
        title = "Distribution of Median Salaries per College Major")
@@ -139,9 +142,14 @@ ggplot(recent_grads, aes(median, major_category)) +
   ggridges::geom_density_ridges(color = "white",
                                 fill = "#A9E5C5") +
   theme_minimal(base_size = 10) +
+  scale_x_continuous("Median Salary of College Majors", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Median Salary Distribution", 
        y = "Major Category",
        title = "Distribution of Median Salaries by Major Category")
+#Having trouble adding geom_text to ggridges 
 
 ```
 
@@ -150,13 +158,13 @@ ggplot(recent_grads, aes(median, major_category)) +
 ```{r plot 2, include=TRUE}
 
 percentages <- recent_grads %>% 
-  mutate(percent_men = men/total*100, 
-         percent_women = women/total*100, 
+  mutate(percent_men = men/total, 
+         percent_women = women/total, 
          total_jobs = college_jobs + non_college_jobs + low_wage_jobs, 
-         percent_college_jobs = college_jobs/total_jobs*100,
-         percent_non_college_jobs = non_college_jobs/total_jobs*100, 
-         percent_low_wage_jobs = low_wage_jobs/total_jobs*100,
-         unemployment_rate_percentage = unemployment_rate*100)
+         percent_college_jobs = college_jobs/total_jobs,
+         percent_non_college_jobs = non_college_jobs/total_jobs, 
+         percent_low_wage_jobs = low_wage_jobs/total_jobs,
+         unemployment_rate_percentage = unemployment_rate)
 
 percents_tidy <- percentages %>% 
   pivot_longer(
@@ -179,65 +187,85 @@ plot_2_b <- percents_tidy %>%
   filter(median <= 40000,
          unemployment_rate_percentage >= 6.50)
 
-ggplot(plot_2_a) +
-  geom_point(aes(unemployment_rate_percentage, median, color = major_category)) +
+ggplot(plot_2_a, aes(unemployment_rate_percentage, median, color = major_category)) +
+  geom_point(size = 2) +
+  scale_color_viridis_d(name = "Major Category") +
   theme(plot.title = element_text(color = "black", 
                                   size = 12, 
                                   face = "bold", 
                                   hjust = 0.5),
         legend.position = "bottom") +
+  scale_x_log10("Unemployment Rate Percentage", labels = scales::percent) +
+  scale_y_log10("Median Salary", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Unemployment Rate Percentage",
        y = "Median Salary",
        title = "Comparison of Employment Rate to Median Salary",
        subtitle = "College Majors with Above Average Median Salary and Below Average Unemployment Rate") 
 
-ggplot(plot_2_a, aes(unemployment_rate_percentage, median)) +
-  geom_point(aes(color = major_category)) +
-   geom_label_repel(aes(label = major_category),
-                   box.padding = 0.35,
-                   point.padding = 0.5,
-                   segment.color = "grey50") +
-  theme_minimal() +
-  theme(plot.title = element_text(color = "black", 
-                                  size = 12, 
-                                  face = "bold", 
-                                  hjust = 0.5),
-        legend.position = "bottom") +
-  labs(x = "Unemployment Rate Percentage",
-       y = "Median Salary",
-       title = "Comparison of Employment Rate to Median Salary",
-       subtitle = "College Majors with Above Average Median Salary and Below Average Unemployment Rate") 
 
-ggplot(plot_2_b, aes(unemployment_rate_percentage, median)) +
-  geom_point(aes(color = major_category), position = "jitter") +
-  geom_label_repel(aes(label = major_category),
-                   box.padding = 0.35,
-                   point.padding = 0.5,
-                   segment.color = "grey50") +
+ggplot(plot_2_b, aes(unemployment_rate_percentage, median, color = major_category)) +
+  geom_point() +
   theme_minimal() +
+  scale_color_viridis_d(name = "Major Category") +
   theme(plot.title = element_text(color = "black", 
                                   size = 12, 
                                   face = "bold", 
                                   hjust = 0.5),
         legend.position = "bottom") +
+  scale_x_log10("Unemployment Rate Percentage", labels = scales::percent) +
+  scale_y_log10("Median Salary", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Unemployment Rate Percentage",
        y = "Median Salary",
        title = "Comparison of Employment Rate to Median Salary",
        subtitle = "College Majors with Below Average Median Salary and Above Average Unemployment Rate") 
-#like the idea but needs a lot of cleaning up and trimming of included data 
+
 
 
 ggplot(percents_tidy, aes(fct_reorder(major_category, unemployment_rate), unemployment_rate)) +
   geom_col(fill = "cornflowerblue",
            alpha = 0.7) +
+  geom_text(aes(major_category, unemployment_rate, label = paste0(round(unemployment_rate), "%",
+            size = 3))) +
   coord_flip() +
+  scale_y_continuous("Unemployment Rate", labels = scales::percent) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
         legend.position = "bottom") +
-  labs(x = "Unemployment Rate",
-       y = "Major Category",
+  labs(x = "Major Category",
        title = "Unemployment Rates per Major Category") 
+#need to keep playing with this one
 
+plot_2_c <- percents_tidy %>% 
+  select(major, major_category, unemployment_rate_percentage, percent_college_jobs) %>% 
+  arrange(desc(unemployment_rate_percentage)) %>% 
+  slice(1:20)
 
+ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color = major_category)) +
+  geom_point(size = 2) +
+  scale_color_viridis_d(name = "Major Category") +
+  geom_text_repel(aes(label = major)) +
+  theme(plot.title = element_text(color = "black", 
+                                  size = 12, 
+                                  face = "bold", 
+                                  hjust = 0.5),
+        legend.position = "bottom") +
+  scale_x_log10("Unemployment Rate", labels = scales::percent) +
+  scale_y_log10("Employment in College Major", labels = scales::percent) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
+  labs(x = "Unemployment Rate",
+       y = "Employment in College Major",
+       title = "Comparison of Employment Rate to Employment in College Major",
+       subtitle = "College Majors with the Highest Unemployment Rate") 
 
 ```
 
@@ -250,8 +278,8 @@ head(women_stem)
 
 
 stem_percentages <- women_stem %>% 
-  mutate(percent_men = men/total*100,
-         percent_women = women/total*100)
+  mutate(percent_men = men/total,
+         percent_women = women/total)
 
 stem_tidy <- stem_percentages %>% 
   pivot_longer(
@@ -271,7 +299,8 @@ ggplot(engineering, aes(percent_men, percent_women)) +
 
 ggplot(engineering, aes(fct_reorder(major, percent_women), percent_women)) +
   geom_col() +
-  coord_flip() 
+  coord_flip() +
+  scale_y_continuous("Percentage of Women Employed", labels = scales::percent) 
   
 
 ggplot(engineering_2, aes(fct_reorder(major, sex_percentages), sex_percentages)) +
@@ -280,14 +309,53 @@ ggplot(engineering_2, aes(fct_reorder(major, sex_percentages), sex_percentages))
            width = 1) +
   coord_flip() +
   facet_wrap(~sex, ncol = 1) +
-  geom_text(aes(label = sex_percentages)) +
+  geom_text(aes(label = round(sex_percentages), 2)) +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5)) +
   labs(x = "Sex Percentage",
        y = "Major",
        title = "Sex Percentage of Enginnering Majors")
 
   
- 
+top_10 <- stem_percentages %>% 
+  group_by(major_category) %>% 
+  top_n(2, percent_women)
 
+bottom_10 <- stem_percentages %>% 
+  group_by(major_category) %>% 
+  top_n(-2, percent_women)
+
+ggplot(stem_percentages, aes(percent_women, percent_men)) +
+  geom_point(color = "gray80") +
+  geom_point(color = "red", data = bind_rows(top_10, bottom_10)) +
+  geom_text_repel(aes(label = major),
+                  data = bind_rows(top_10, bottom_10),
+                  size = 2) +
+  facet_wrap(~major_category) +
+  theme_minimal() +
+  theme(plot.title = element_text(color = "black", 
+                                  size = 12, 
+                                  face = "bold", 
+                                  hjust = 0.5)) +
+  scale_x_log10("Percent Women Employed", labels = scales::percent) +
+  scale_y_log10("Percent Men Employed", labels = scales::percent) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
+  theme(plot.title = element_text(color = "black", 
+                                  size = 12, 
+                                  face = "bold", 
+                                  hjust = 0.5)) +
+  labs(title = "Gender Employment Percentages in STEM Related Fields")
+
+table <- bind_rows(top_10, bottom_10) %>% 
+  select(major, median, percent_women, percent_men)
+
+table %>% 
+  gt() %>% 
+  cols_label(major = "College Major",
+             median = "Median Salary",
+             percent_women = "Percent Women Employed",
+             percent_men = "Percent Men Employed") %>% 
+  cols_align(align = "left", columns = vars(major)) 
 ```
 
