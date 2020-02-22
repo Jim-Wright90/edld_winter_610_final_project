@@ -21,6 +21,8 @@ library(gghighlight)
 library(forcats)
 library(ggrepel)
 library(gt)
+library(knitr)
+library(kableExtra)
 
 
 all_ages <- import(here("data", "all-ages.csv"),
@@ -83,10 +85,10 @@ median_top_20 <- recent_grads %>%
 ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
-  geom_text(aes(major, median, label = median),
+  geom_text(aes(major, median, label = scales::dollar(median)),
             nudge_y = 0.02,
             size = 3) +
-  scale_fill_OkabeIto() +
+  scale_fill_brewer(palette = "Dark2") +
   coord_flip() +
   scale_y_continuous("Median Salary", labels = scales::dollar) +
   theme(panel.grid.major.y = element_blank(),
@@ -98,7 +100,6 @@ ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
        y = "Median Salary",
        fill = "Major Category",
        title = "Top 20 Median Salaries by College Major") 
-#Need to identify how to insert dollar sign into text label on plot
 
 median_bottom_20 <- recent_grads %>% 
   arrange(median) %>% 
@@ -107,10 +108,10 @@ median_bottom_20 <- recent_grads %>%
 ggplot(median_bottom_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
-  geom_text(aes(major, median, label = median),
+  geom_text(aes(major, median, label = scales::dollar(median)),
             nudge_y = 0.02,
             size = 3) +
-  scale_fill_OkabeIto() +
+  scale_fill_brewer(palette = "Dark2") +
   coord_flip() +
   scale_y_continuous("Median Salary", labels = scales::dollar) +
   theme(panel.grid.major.y = element_blank(),
@@ -231,7 +232,7 @@ ggplot(percents_tidy, aes(fct_reorder(major_category, unemployment_rate), unempl
   geom_col(fill = "cornflowerblue",
            alpha = 0.7) +
   geom_text(aes(major_category, unemployment_rate, label = paste0(round(unemployment_rate), "%",
-            size = 3))) +
+            size = 2))) +
   coord_flip() +
   scale_y_continuous("Unemployment Rate", labels = scales::percent) +
   theme(panel.grid.major.y = element_blank(),
@@ -251,7 +252,8 @@ plot_2_c <- percents_tidy %>%
 ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color = major_category)) +
   geom_point(size = 2) +
   scale_color_viridis_d(name = "Major Category") +
-  geom_text_repel(aes(label = major)) +
+  geom_text_repel(aes(label = major),
+                  size = 3) +
   theme(plot.title = element_text(color = "black", 
                                   size = 12, 
                                   face = "bold", 
@@ -302,6 +304,16 @@ ggplot(engineering, aes(fct_reorder(major, percent_women), percent_women)) +
   coord_flip() +
   scale_y_continuous("Percentage of Women Employed", labels = scales::percent) 
   
+ggplot(engineering, aes(fct_reorder(major, percent_women), percent_women)) +
+  geom_col(fill = "#0000FF",
+          alpha = 0.7) +
+  geom_text(aes(major, percent_women, label = scales::percent(percent_women, digits = 2)),
+            nudge_y = -0.05,
+            size = 3,
+            color = "white") +
+  coord_flip() +
+  scale_y_continuous("Percentage of Women Employed", labels = scales::percent) 
+
 
 ggplot(engineering_2, aes(fct_reorder(major, sex_percentages), sex_percentages)) +
   geom_col(fill = "cornflowerblue",
@@ -348,7 +360,8 @@ ggplot(stem_percentages, aes(percent_women, percent_men)) +
   labs(title = "Gender Employment Percentages in STEM Related Fields")
 
 table <- bind_rows(top_10, bottom_10) %>% 
-  select(major, median, percent_women, percent_men)
+  select(major, median, percent_women, percent_men) %>% 
+
 
 table %>% 
   gt() %>% 
@@ -356,6 +369,13 @@ table %>%
              median = "Median Salary",
              percent_women = "Percent Women Employed",
              percent_men = "Percent Men Employed") %>% 
-  cols_align(align = "left", columns = vars(major)) 
+  fmt_percent(vars(percent_women, percent_men), decimals = 0) %>% 
+  fmt_currency(vars(median), currency = "USD") %>% 
+  cols_align(align = "left", columns = vars(major))
+
+
+
+
+info_currencies()
 ```
 
