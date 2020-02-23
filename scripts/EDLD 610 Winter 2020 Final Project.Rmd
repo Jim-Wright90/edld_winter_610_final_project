@@ -360,7 +360,7 @@ ggplot(stem_percentages, aes(percent_women, percent_men)) +
   labs(title = "Gender Employment Percentages in STEM Related Fields")
 
 table <- bind_rows(top_10, bottom_10) %>% 
-  select(major, median, percent_women, percent_men) %>% 
+  select(major, median, percent_women, percent_men) 
 
 
 table %>% 
@@ -369,13 +369,17 @@ table %>%
              median = "Median Salary",
              percent_women = "Percent Women Employed",
              percent_men = "Percent Men Employed") %>% 
+  cols_align(align = "left", columns = vars(major)) %>% 
+  cols_align(align = "center", columns = vars(percent_men, percent_women)) %>% 
+  tab_header(title = "STEM Major Statistics") %>% 
   fmt_percent(vars(percent_women, percent_men), decimals = 0) %>% 
   fmt_currency(vars(median), currency = "USD") %>% 
-  cols_align(align = "left", columns = vars(major))
+  cols_align(align = "left", columns = vars(major)) %>% 
+  tab_source_note(source_note = md("Data from [fivethirtyeight](https://https://github.com/fivethirtyeight/data/tree/master/college-majors)"))
 
 
 
 
-info_currencies()
+#info_currencies()
 ```
 
