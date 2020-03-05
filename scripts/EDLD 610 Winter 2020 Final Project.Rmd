@@ -90,7 +90,8 @@ ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
             size = 3) +
   scale_fill_brewer(palette = "Dark2") +
   coord_flip() +
-  scale_y_continuous("Median Salary", labels = scales::dollar) +
+  scale_y_continuous("Median Salary", 
+                     labels = scales::dollar) +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_line(color = "gray80")) +
@@ -138,6 +139,18 @@ ggplot(recent_grads, aes(median)) +
   labs(x = "Median Salary of College Majors",
        y = "Total",
        title = "Distribution of Median Salaries per College Major")
+
+p <- ggplot(recent_grads, aes(median, major_category)) +
+  ggridges::geom_density_ridges(color = "white",
+                                fill = "#A9E5C5") +
+  theme_minimal(base_size = 10) +
+  scale_x_continuous("Median Salary of College Majors", labels = scales::dollar) +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "gray80")) +
+  labs(x = "Median Salary Distribution", 
+       y = "Major Category",
+       title = "Distribution of Median Salaries by Major Category")
 
 ggplot(recent_grads, aes(median, major_category)) +
   ggridges::geom_density_ridges(color = "white",
@@ -189,7 +202,8 @@ plot_2_b <- percents_tidy %>%
          unemployment_rate_percentage >= 6.50)
 
 ggplot(plot_2_a, aes(unemployment_rate_percentage, median, color = major_category)) +
-  geom_point(size = 2) +
+  geom_point(size = 2,
+             alpha = 0.5) +
   scale_color_viridis_d(name = "Major Category") +
   theme(plot.title = element_text(color = "black", 
                                   size = 12, 
@@ -249,7 +263,7 @@ plot_2_c <- percents_tidy %>%
   arrange(desc(unemployment_rate_percentage)) %>% 
   slice(1:20)
 
-ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color = major_category)) +
+ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color = major_category))+
   geom_point(size = 2) +
   scale_color_viridis_d(name = "Major Category") +
   geom_text_repel(aes(label = major),
