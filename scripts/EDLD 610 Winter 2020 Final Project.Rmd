@@ -397,3 +397,28 @@ table %>%
 #info_currencies()
 ```
 
+
+Mike's comments:
+
+Jim, thanks for sharing your final project draft with me.  I like your data sets and the thoroughness of your comments.  Everything was very clear to an uninformed reader (me).  Following are some comments (organized by letter in the assignment instruction on the course website):
+
+Strengths (a):
+1.  Outside-the-box thinking.  Each of your plots is creative and a clear departure from the standard type found in journals in the business field.  This immediately grabbed my interest and made me want to spend enough time to digest the message of each plot.
+2.  Variety in plots.  The variety of plots is another strength.  Instead of just a single plot with different data repeated over and over, you vary between bar plots, scatter plots, and others, clearly delineating a difference in the data and message of each plot.
+3.  Labels & titles & color.  The use of labels for not just your axes and titles but also your data points further facilitates understanding of what you are communicating.  The use of color was also effective in viewing the differences between majors. 
+  
+
+Learning from script (b):
+1.  Your script is well-organized and easy to follow due to the consistency of spacing and indentation.  This facilitates meaningful review of the script.
+2.  The data reading and cleaning in the first chunk is a good practice I intend to incorporate into my own scripting.  It seems like good practice to handle data cleaning up-front, whereas I typically address it later in my script - not so good.
+3.  Your use of piping is another strength, easily traceable to see what you intend to accomplish with each function call.
+
+
+Suggestions (c):
+I know these plots are working drafts, so these suggestions are probably things you have already considered.
+1.  Variables.  Perhaps you could facet wrap by major in your scatter plot.  I struggled a little in identifying correlation trends among the different majors by salary and unemployment rate due to the overlap.  Maybe dodging or alpha level changes could also help.
+2.  Labels.  Some of the labels didn't render well on my screen.  For example, the bar labels on the bar chart titled "Unemployment Rates per Major Category" weren't readable.  Also, the data labels on the scatter plot titled "Comparison of Employment Rate to Employment in College Major" each printed twice.
+
+Great work, and good luck on your final project!  I look forward to seeing the final version next week.
+
+Mike
