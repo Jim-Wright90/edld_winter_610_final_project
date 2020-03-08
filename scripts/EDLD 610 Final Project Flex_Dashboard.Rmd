@@ -104,7 +104,8 @@ ggplot(recent_grads, aes(median)) +
         panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Median Salary of College Majors",
        y = "Total",
-       title = "Distribution of Median Salaries per College Major")
+       title = "Distribution of Median Salaries \nper College Major") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -120,7 +121,8 @@ ggplot(recent_grads, aes(median, major_category)) +
         panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Median Salary Distribution", 
        y = "Major Category",
-       title = "Distribution of Median Salaries by Major Category")
+       title = "Distribution of Median Salaries \nby Major Category") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -266,8 +268,9 @@ ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color =
         panel.grid.major.x = element_line(color = "gray80")) +
   labs(x = "Unemployment Rate",
        y = "Employment in College Major",
-       title = "Comparison of Unemployment Rate to College Major Employment Rate",
-       subtitle = "College Majors with the Highest Unemployment Rate") 
+       title = "Comparison of Unemployment Rate \nto College Major Employment Rate",
+       subtitle = "College Majors with the Highest Unemployment Rate") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
