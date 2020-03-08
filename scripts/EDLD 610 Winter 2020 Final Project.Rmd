@@ -165,6 +165,8 @@ ggplot(recent_grads, aes(median, major_category)) +
        title = "Distribution of Median Salaries by Major Category")
 #Having trouble adding geom_text to ggridges 
 
+# A couple of suggestions: The x-axis label could simply read “Median salary” rather than “Median salary of college majors”, since we already know it’s by major. Or, it could read “Median salary at XXX years post-graduation” or something like that – something that helps us understand that data a bit more. Also, you could fct_reorder the majors in a meaningful way, e.g. highest to lowest median salary.  
+
 ```
 
 # Plot 2
@@ -283,6 +285,8 @@ ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color =
        title = "Comparison of Employment Rate to Employment in College Major",
        subtitle = "College Majors with the Highest Unemployment Rate") 
 
+#  For plot_2_c, I was a little bit confused by the fact that there are 2 labels for each major, since there’s just one dot per major. I looked at the data for this plot, and it looks like you do indeed have duplicate info for each major, so remedying the data might fix this.  
+
 ```
 
 
@@ -395,5 +399,7 @@ table %>%
 
 
 #info_currencies()
+
+# For your table: This is a super minor thing, but I would suggest taking out the capitalization of the majors. For some reason this made it take longer for me to make sense of the categories. You could also shade and/or bold only the rows that are the categories and leave the rows that are specific majors white.
 ```
 
