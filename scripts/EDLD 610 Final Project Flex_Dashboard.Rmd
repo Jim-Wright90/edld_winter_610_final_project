@@ -6,6 +6,7 @@ output:
     social: menu
     source_code: embed
     vertical_layout: scroll
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
@@ -57,7 +58,7 @@ women_stem <- import(here("data", "women-stem.csv"),
 *_Description of Data_* {.sidebar}
 --------
 
-The data for this project consists of five data sets from the FiveThirtyEight GitHub page. (https://github.com/fivethirtyeight/data/tree/master/college-majors). All data is from American Community Survey 2010-2012 Public Use Microdata Series. The plots for this project exclusively used the recent_grads.csv and women_stem.csv data sets, which both contain data on basic earnings and labor force information. Both data sets were arranged in order of median salary for reported college major on the survey. 
+The data for this project consists of five data sets from the FiveThirtyEight GitHub page. (https://github.com/fivethirtyeight/data/tree/master/college-majors). All data is from the American Community Survey 2010-2012 Public Use Microdata Series. The plots for this project exclusively used the recent_grads.csv and women_stem.csv data sets, which both contain data on basic earnings and labor force information. Both data sets were arranged in order of median salary for reported college major on the survey. 
 
 *_Plot 1 Narrative:_* I wanted to plot 1 to communicate median salary per either college major or major category. Since there are so many majors in the data set, I decided it would be easier to begin with major category as there were only 16 values. In version 2, I highlighted the education category as we learned in class. For versions 3 and 4, I wanted to explore this distribution with other plots besides a bar graph, so I tried a histogram and density plot with ggridges. For the final version, I decided to go back to the barplot by focusing on the top 20 median salaries per college majors and use color in the plot to identify the major category. I factor reorderded to arrange the college majors on the y-axis (via coord_flip) from greatest to least. As displayed on the plot, the most lucrative college majors are in the major category Engineering. 
 
@@ -134,12 +135,14 @@ median_top_20 <- recent_grads %>%
 ```
 
 ```{r plot 1, final version}
-p_3 <- ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
+ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
   geom_col(aes(fill = major_category),
   alpha = 0.7) +
-  geom_text(aes(major, median, label = scales::dollar(median)),
+  geom_text(aes(major, median, label = scales::dollar(median/1000)),
+            hjust = 1.1,
             nudge_y = 0.02,
-            size = 3) +
+            size = 3,
+            color = "white") +
   scale_fill_brewer(palette = "Dark2") +
   coord_flip() +
   scale_y_continuous("Median Salary", 
@@ -150,11 +153,11 @@ p_3 <- ggplot(median_top_20, aes(fct_reorder(major, median), median)) +
   theme(plot.title = element_text(color = "black", size = 12, face = "bold", hjust = 0.5),
         legend.position = "bottom") +
   labs(x = "College Major",
-       y = "Median Salary",
+       y = "Median Salary (Thousands)",
        fill = "Major Category",
-       title = "Top 20 Median Salaries by College Major") 
+       title = "Top 20 Median Salaries \nby College Major") 
 
-ggplotly(p_3)
+
 
 ```
 
@@ -251,7 +254,9 @@ plot_2_c <- percents_tidy %>%
 ```
 
 ```{r plot 2 final version}
-ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color = major_category))+
+plot_2_c %>% 
+  distinct() %>% 
+  ggplot(aes(unemployment_rate_percentage, percent_college_jobs, color = major_category))+
   geom_point(size = 2) +
   scale_color_viridis_d(name = "Major Category") +
   geom_text_repel(aes(label = major),
@@ -278,7 +283,7 @@ ggplot(plot_2_c, aes(unemployment_rate_percentage, percent_college_jobs, color =
 
 Description of Plot 3 {.sidebar}
 --------
-*_Plot 3 Narrative:_* The goal of plot 3 was to use the recent_grads and women_stem data sets to compare trends in the percentage of women working in these fields. I first used the mutate function to create variables for the percentage of men and women working in each major field for the women_stem data set. I then pivoted longer to have a variable with a value for each gender percentage per college major. Similar to the first two plots, because there are so many majors in the data set, I decided to focus specifically on the major category of engineering as it is the category with the most consistently high median salary per engineering major. Therefore, I used the filter function to identify all majors under the engineering category and then plotted the data set in a bar graph using factor reorder to arrange the data set from highest percentage of women employed to lowest percent of women employed. In version 2, I added color to the bars and used geom_text to label each bar with its percentage of women employed. In the final version, I borrowed the idea from one of the class lecture examples and first created two objects to filter out the top ten majors and bottom ten majors for percentage of women employed. After this step, I use bind_rows within the geom_point function to combine these two objects together to compare percentage of women employed on the x-axis and men employed on the y-axis. The plot is faceted by major category and labeled in each plot by specific major. What I really like about this plot is that it accurately depicts my field of speech-language pathology which is almost entirely female. Lastly, I thought it would be fun to incorporate this same data into a gt table to get some practice with that function. 
+*_Plot 3 Narrative:_* The goal of plot 3 was to use the recent_grads and women_stem data sets to compare trends in the percentage of women working in these fields. I first used the mutate function to create variables for the percentage of men and women working in each major field for the women_stem data set. I then pivoted longer to have a variable with a value for each gender percentage per college major. Similar to the first two plots, because there are so many majors in the data set, I decided to focus specifically on the major category of engineering as it is the category with the most consistently high median salary per engineering major. Therefore, I used the filter function to identify all majors under the engineering category and then plotted the data set in a bar graph using factor reorder to arrange the data set from highest percentage of women employed to lowest percent of women employed. In version 2, I added color to the bars and used geom_text to label each bar with its percentage of women employed. In the final version, I borrowed the idea from one of the class lecture examples and first created two objects to filter out the top ten majors and bottom ten majors for percentage of women employed. After this step, I use bind_rows within the geom_point function to combine these two objects together to compare percentage of women employed on the x-axis and men employed on the y-axis. The plot is faceted by major category and labeled in each plot by specific major. What I really like about this plot is that it accurately depicts my field of speech-language pathology which is almost entirely female. Lastly, I thought it would be fun to incorporate this same data into a gt table to get some practice with that function. The gt table didn't render very well into Flexdashboard, so I pivoted to a reactable table. 
 
 Column {.tabset data-width=1000}
 -----------------------------------------------------------------------
@@ -339,7 +344,7 @@ bottom_10 <- stem_percentages %>%
   top_n(-2, percent_women)
 ```
 
-```{r plot 3 final version}
+```{r plot 3 final version, fig.width=8, fig.height=6}
 ggplot(stem_percentages, aes(percent_women, percent_men)) +
   geom_point(color = "gray80") +
   geom_point(color = "red", data = bind_rows(top_10, bottom_10)) +
@@ -386,3 +391,27 @@ table %>%
   cols_align(align = "left", columns = vars(major)) %>% 
   tab_source_note(source_note = md("Data from [fivethirtyeight](https://https://github.com/fivethirtyeight/data/tree/master/college-majors)"))
 ```
+
+### Reactable Table
+```{r plot 3, reactable table data cleaning, include=FALSE}
+
+table_react <- bind_rows(top_10, bottom_10) %>% 
+  select(major_category, major, median, percent_women, percent_men) %>% 
+  rename("Major Category" = major_category,
+         Major = major,
+         "Median Salary" = median,
+         "Percent Women Employed" = percent_women,
+         "Percent Men Employed" = percent_men)
+
+```
+
+```{r plot 3, reactable table}
+
+reactable(table_react, columns = list(
+  "Median Salary" = colDef(format = colFormat(prefix = "$", separators = TRUE, digits = 2)),
+  "Percent Women Employed" = colDef(format = colFormat(percent = TRUE, digits = 2)),
+  "Percent Men Employed" = colDef(format = colFormat(percent = TRUE, digits = 2))
+))
+
+```
+
